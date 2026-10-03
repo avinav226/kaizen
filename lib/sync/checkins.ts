@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/client';
 import { useCheckins } from '@/lib/store/checkins';
+import { primeOfflinePages } from './prime';
 
 let syncing = false;
 
@@ -13,10 +14,14 @@ export async function syncCheckins(): Promise<void> {
   if (syncing) return;
   syncing = true;
   try {
+    let didSend = false;
     for (;;) {
       const { goalId, entries, pending } = useCheckins.getState();
       const dates = Object.keys(pending);
-      if (!goalId || dates.length === 0) return;
+      if (!goalId || dates.length === 0) {
+        if (didSend) void primeOfflinePages(['/today', '/checkin']); // keep the offline copy current
+        return;
+      }
 
       for (const date of dates) {
         const entry = entries[date];
@@ -29,6 +34,7 @@ export async function syncCheckins(): Promise<void> {
           );
         if (error) return;
         useCheckins.getState().markSynced(date, version);
+        didSend = true;
       }
     }
   } catch {

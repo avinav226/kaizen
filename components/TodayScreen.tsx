@@ -10,6 +10,7 @@ import { useNow } from '@/lib/hooks/useNow';
 import { nextReviewDate } from '@/lib/review';
 import { stepOn } from '@/lib/steps';
 import { useCheckins } from '@/lib/store/checkins';
+import { primeOfflinePages } from '@/lib/sync/prime';
 import { periodSummary } from '@/lib/summaries';
 import type { TodayData } from '@/lib/types';
 import { LogoRing } from './icons/LogoRing';
@@ -22,7 +23,9 @@ export function TodayScreen({ data }: { data: TodayData }) {
   const entries = useCheckins((s) => s.entries);
   const hydrate = useCheckins((s) => s.hydrate);
 
-  useEffect(() => hydrate(data.goal.id), [hydrate, data]);
+  useEffect(() => hydrate(data.goal.id, !navigator.onLine), [hydrate, data]);
+  // First visit: save Today and Check-in so they open with no connection.
+  useEffect(() => void primeOfflinePages(['/today', '/checkin']), []);
 
   if (!now) return <main className="flex-1" />;
 
@@ -73,11 +76,9 @@ export function TodayScreen({ data }: { data: TodayData }) {
         ) : (
           <span />
         )}
-        <form action="/auth/signout" method="post">
-          <button type="submit" className="min-h-11 px-2 text-[13px] text-text-muted underline">
-            Sign out
-          </button>
-        </form>
+        <Link href="/settings" className="flex min-h-11 items-center px-2 text-[13px] text-text-muted underline">
+          Settings
+        </Link>
       </div>
     </main>
   );

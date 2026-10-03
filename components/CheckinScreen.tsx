@@ -37,7 +37,7 @@ export function CheckinScreen({ data }: { data: TodayData }) {
   const [saved, setSaved] = useState(false);
   const applied = useRef(false);
 
-  useEffect(() => hydrate(data.goal.id), [hydrate, data]);
+  useEffect(() => hydrate(data.goal.id, !navigator.onLine), [hydrate, data]);
 
   const today = now?.date;
   const start = data.goal.started_at ?? today;

@@ -20,7 +20,7 @@ interface CheckinState {
   pending: Record<ISODate, number>;
   versions: Record<ISODate, number>;
   /** Fresh server data arrived: drop confirmed local entries, keep unsynced ones. */
-  hydrate: (goalId: string) => void;
+  hydrate: (goalId: string, keepSynced?: boolean) => void;
   record: (date: ISODate, answer: Answer, note: string | null, stepId: string | null) => void;
   markSynced: (date: ISODate, version: number) => void;
   reset: () => void;
@@ -33,13 +33,14 @@ export const useCheckins = create<CheckinState>()(
     (set) => ({
       ...empty,
 
-      hydrate: (goalId) =>
+      // Offline, the server copy is only a saved snapshot, so everything done on this device stays.
+      hydrate: (goalId, keepSynced = false) =>
         set((s) => {
           if (s.goalId !== goalId) return { ...empty, goalId };
           const entries: Record<ISODate, Entry> = {};
           for (const [date, e] of Object.entries(s.entries)) {
             const recent = e.syncedAt !== undefined && Date.now() - e.syncedAt < RECENT_MS;
-            if (date in s.pending || recent) entries[date] = e;
+            if (date in s.pending || recent || keepSynced) entries[date] = e;
           }
           return { entries };
         }),

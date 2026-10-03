@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const PUBLIC_PREFIXES = ['/login', '/auth'];
+// Public so the browser can fetch them with no session: sign-in, the service worker and the manifest.
+const PUBLIC_PREFIXES = ['/login', '/auth', '/serwist', '/manifest.webmanifest'];
 
 /** Refreshes the Supabase session cookie and sends signed-out visitors to /login. */
 export async function updateSession(request: NextRequest) {

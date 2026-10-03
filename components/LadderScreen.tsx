@@ -78,8 +78,7 @@ export function LadderScreen() {
       return;
     }
     useOnboarding.getState().reset();
-    router.replace('/today');
-    router.refresh();
+    router.replace('/install'); // the one-time home-screen offer; it moves on at once if there is nothing to offer
   }
 
   const rung = (r: 'longTerm' | 'milestone' | 'step' | 'planB') => ({
