@@ -45,3 +45,24 @@ body {
   font-size: 15px;
   line-height: 23px;
 }
+
+/* Every tap should answer back, even on a slow connection. */
+button,
+a[href] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  transition: opacity 80ms ease-out, transform 80ms ease-out;
+}
+button:not(:disabled):active,
+a[href]:active {
+  opacity: 0.8;
+}
+@media (prefers-reduced-motion: no-preference) {
+  button:not(:disabled):active,
+  a[href]:active {
+    transform: scale(0.98);
+  }
+}
+button:disabled {
+  cursor: default;
+}

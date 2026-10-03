@@ -64,7 +64,8 @@ export function CheckinScreen({ data }: { data: TodayData }) {
       applied.current = true;
       const existing = checkins.find((c) => c.date === today);
       apply(wanted as Answer, existing?.note ?? null);
-      router.replace('/checkin');
+      // Tidy the URL in place. A router navigation would refetch the page and could bring back stale data.
+      window.history.replaceState(null, '', '/checkin');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [today, start, params]);

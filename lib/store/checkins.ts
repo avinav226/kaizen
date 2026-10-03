@@ -5,7 +5,12 @@ import type { LocalEntry } from '@/lib/checkinMerge';
 
 export interface Entry extends LocalEntry {
   stepId: string | null;
+  /** When the server confirmed this entry. Recent ones stay on screen even if a stale server copy arrives. */
+  syncedAt?: number;
 }
+
+/** How long a confirmed entry outranks fresh server data (covers reads that started before the save landed). */
+const RECENT_MS = 120_000;
 
 interface CheckinState {
   goalId: string | null;
@@ -32,7 +37,10 @@ export const useCheckins = create<CheckinState>()(
         set((s) => {
           if (s.goalId !== goalId) return { ...empty, goalId };
           const entries: Record<ISODate, Entry> = {};
-          for (const date of Object.keys(s.pending)) entries[date] = s.entries[date];
+          for (const [date, e] of Object.entries(s.entries)) {
+            const recent = e.syncedAt !== undefined && Date.now() - e.syncedAt < RECENT_MS;
+            if (date in s.pending || recent) entries[date] = e;
+          }
           return { entries };
         }),
 
@@ -40,7 +48,7 @@ export const useCheckins = create<CheckinState>()(
         set((s) => {
           const version = (s.versions[date] ?? 0) + 1;
           return {
-            entries: { ...s.entries, [date]: { answer, note, stepId } },
+            entries: { ...s.entries, [date]: { answer, note, stepId } }, // no syncedAt until confirmed
             versions: { ...s.versions, [date]: version },
             pending: { ...s.pending, [date]: version },
           };
@@ -51,7 +59,8 @@ export const useCheckins = create<CheckinState>()(
         set((s) => {
           if (s.pending[date] !== version) return s;
           const pending = Object.fromEntries(Object.entries(s.pending).filter(([d]) => d !== date));
-          return { pending };
+          const entry = s.entries[date];
+          return { pending, entries: entry ? { ...s.entries, [date]: { ...entry, syncedAt: Date.now() } } : s.entries };
         }),
 
       reset: () => set({ ...empty }),
