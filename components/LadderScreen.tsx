@@ -72,6 +72,7 @@ export function LadderScreen() {
       p_frequency: s.frequency,
     });
     if (error) {
+      console.error('complete_onboarding failed', error);
       setSaving(false);
       setFailed(true);
       return;
