@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <style dangerouslySetInnerHTML={{ __html: themeCss() }} />
       </head>
       <body>
-        <div className="mx-auto min-h-dvh w-full max-w-[var(--t-layout-max-width)] px-6 pt-[max(56px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
+        <div className="mx-auto flex min-h-dvh flex-col w-full max-w-[var(--t-layout-max-width)] px-6 pt-[max(56px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))]">
           {children}
         </div>
       </body>
