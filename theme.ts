@@ -50,6 +50,7 @@ export const colors = {
 export const fonts = {
   display: 'var(--font-shippori), Georgia, serif', // steps, goals, headlines
   body: 'var(--font-plex), system-ui, sans-serif',
+  bodyMedium: 'var(--font-plex), system-ui, sans-serif', // used with weight.medium
 } as const;
 
 export const weight = {

@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+/* Token values are injected on :root from theme.ts (see lib/themeCss.ts).
+   Tailwind utilities below read those variables. No hex values here. */
+@theme inline {
+  --color-*: initial;
+  --color-background: var(--t-color-background);
+  --color-surface: var(--t-color-surface);
+  --color-surface-muted: var(--t-color-surface-muted);
+  --color-surface-sunken: var(--t-color-surface-sunken);
+  --color-text: var(--t-color-text);
+  --color-text-secondary: var(--t-color-text-secondary);
+  --color-text-muted: var(--t-color-text-muted);
+  --color-border: var(--t-color-border);
+  --color-border-strong: var(--t-color-border-strong);
+  --color-border-dashed: var(--t-color-border-dashed);
+  --color-divider: var(--t-color-divider);
+  --color-accent: var(--t-color-accent);
+  --color-accent-deep: var(--t-color-accent-deep);
+  --color-accent-soft: var(--t-color-accent-soft);
+  --color-accent-bg: var(--t-color-accent-bg);
+  --color-accent-bg-strong: var(--t-color-accent-bg-strong);
+  --color-accent-border: var(--t-color-accent-border);
+  --color-on-accent: var(--t-color-on-accent);
+  --color-positive: var(--t-color-positive);
+  --color-positive-bg: var(--t-color-positive-bg);
+  --color-clay: var(--t-color-clay);
+  --color-clay-bg: var(--t-color-clay-bg);
+  --color-error: var(--t-color-error);
+  --font-display: var(--font-shippori), Georgia, serif;
+  --font-sans: var(--font-plex), system-ui, sans-serif;
+}
+
+html {
+  background: var(--t-color-background);
+}
+
+body {
+  background: var(--t-color-background);
+  color: var(--t-color-text);
+  font-family: var(--font-plex), system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 23px;
+}
