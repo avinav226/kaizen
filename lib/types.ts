@@ -16,3 +16,29 @@ export interface DateRange {
 }
 
 export type Decision = 'grow' | 'keep' | 'shrink';
+
+export interface Step {
+  id: string;
+  text: string;
+  frequency: Frequency;
+  active_from: ISODate;
+  active_to: ISODate | null;
+}
+
+export interface Goal {
+  id: string;
+  title: string;
+  started_at: ISODate | null;
+  status: 'active' | 'later' | 'dropped' | 'done';
+}
+
+export interface TodayData {
+  timezone: string;
+  onboardedAt: ISODate;
+  goal: Goal;
+  steps: Step[];
+  planB: string | null;
+  checkins: Checkin[];
+  later: { id: string; title: string }[];
+  completedReviews: number;
+}

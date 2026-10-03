@@ -15,8 +15,8 @@ Accounts and keys needed before and during the build. Do items 1–5 before Step
 - [ ] Create a project at supabase.com. Choose the region closest to your users. Save the database password.
 - [ ] Project Settings → API: copy
   - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
-  - `anon` public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  - `service_role` key → `SUPABASE_SERVICE_ROLE_KEY` (server only, never exposed to the browser)
+  - `anon` public key → `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+  - `service_role` key → `SUPABASE_SECRET_KEY` (server only, never exposed to the browser)
 - [ ] Authentication → URL Configuration:
   - Site URL: the Vercel production URL
   - Redirect URLs: `http://localhost:3000/**`, the production URL `/**`, and `https://*-<your-vercel-team>.vercel.app/**` for previews
@@ -59,15 +59,15 @@ Accounts and keys needed before and during the build. Do items 1–5 before Step
 | Variable | Where | Needed by |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | client + server | Step 0 |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client + server | Step 0 |
-| `SUPABASE_SERVICE_ROLE_KEY` | server only | Step 4 (push API), debug seeding |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | client + server | Step 0 |
+| `SUPABASE_SECRET_KEY` | server only | Step 4 (push API), debug seeding |
 | `ANTHROPIC_API_KEY` | server only | Step 5 |
 | `LADDER_MODEL` | server only | Step 5 |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | client | Step 4 |
 | `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | server + Edge Function | Step 4 |
 | `RESEND_API_KEY` | server | Step 4 (optional) |
 | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN` | client / build | Step 8 |
-| `NEXT_PUBLIC_DEBUG_MENU` | client | dev and preview only; never set in Production |
+| `NEXT_PUBLIC_DEBUG_MENU` | client | `1` while testing (shows the debug menu at `/debug`). Remove it before a public launch. |
 
 ## What I need back from you to start Step 0
 1. Confirmation that sections 2–4 are done.

@@ -23,8 +23,11 @@
   --color-accent-border: var(--t-color-accent-border);
   --color-on-accent: var(--t-color-on-accent);
   --color-positive: var(--t-color-positive);
+  --color-positive-deep: var(--t-color-positive-deep);
+  --color-positive-border: var(--t-color-positive-border);
   --color-positive-bg: var(--t-color-positive-bg);
   --color-clay: var(--t-color-clay);
+  --color-clay-border: var(--t-color-clay-border);
   --color-clay-bg: var(--t-color-clay-bg);
   --color-error: var(--t-color-error);
   --font-display: var(--font-shippori), Georgia, serif;
