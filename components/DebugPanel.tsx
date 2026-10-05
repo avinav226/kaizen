@@ -23,6 +23,7 @@ export function DebugPanel({ goalId, timezone }: Props) {
   const router = useRouter();
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   /** Shows "Working…" at once, then the result. The message stays pinned on screen. */
   async function run(label: string, work: () => Promise<string>) {
@@ -89,6 +90,34 @@ export function DebugPanel({ goalId, timezone }: Props) {
       useCheckins.getState().reset();
       return 'Done. All check-ins cleared.';
     });
+  }
+
+  /**
+   * Removes every goal (and with it the ladders, steps, check-ins and reviews), marks the
+   * account as not onboarded, and forgets everything this device kept, so the whole
+   * first-run flow can be tested again. Needs a second tap to confirm.
+   */
+  function startOver() {
+    if (!confirmReset) {
+      setConfirmReset(true);
+      setMessage('This deletes all your goals and check-ins. Tap "Delete everything and start over" again to confirm.');
+      return;
+    }
+    return run('Starting over', async () => {
+      const supabase = createClient();
+      const fail = (step: string, error: { message: string } | null) => {
+        if (error) throw new Error(`${step}: ${error.message}`);
+      };
+      fail('deleting goals', (await supabase.from('goals').delete().not('id', 'is', null)).error);
+      fail('resetting your profile', (await supabase.from('profiles').update({ onboarded_at: null }).not('id', 'is', null)).error);
+      Object.keys(localStorage)
+        .filter((k) => k.startsWith('kaizen.'))
+        .forEach((k) => localStorage.removeItem(k));
+      // A full page load on purpose: in-memory app state would otherwise write itself back to storage.
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.assign('/onboarding');
+      return 'Done. Opening onboarding…';
+    }).finally(() => setConfirmReset(false));
   }
 
   function clearLocal() {
@@ -169,6 +198,26 @@ export function DebugPanel({ goalId, timezone }: Props) {
         <button type="button" disabled={busy} className={btn} onClick={clearLocal}>
           Clear local data on this device
         </button>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="font-medium">Start over</h2>
+        <p className="text-text-secondary">Deletes your goals, steps and check-ins and opens onboarding again, as if you had just signed up.</p>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={startOver}
+          className={`min-h-11 rounded-[12px] border px-4 text-left disabled:opacity-50 ${
+            confirmReset ? 'border-accent bg-accent text-on-accent' : 'border-border-strong bg-surface'
+          }`}
+        >
+          {confirmReset ? 'Delete everything and start over' : 'Start over (restart onboarding)'}
+        </button>
+        {confirmReset && (
+          <button type="button" className={btn} onClick={() => { setConfirmReset(false); setMessage('Cancelled. Nothing was deleted.'); }}>
+            Cancel
+          </button>
+        )}
       </section>
 
       {message && (
