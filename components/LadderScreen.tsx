@@ -8,6 +8,7 @@ import { useMounted } from '@/lib/hooks/useMounted';
 import { requestLadder } from '@/lib/ladderClient';
 import { useOnboarding } from '@/lib/store/onboarding';
 import { isStepTooBig } from '@/lib/stepSize';
+import { debugEnabled } from '@/lib/debug';
 import { createClient } from '@/lib/supabase/client';
 import { CheckIcon } from './icons/CheckIcon';
 import { FrequencyPicker } from './FrequencyPicker';
@@ -27,7 +28,7 @@ export function LadderScreen() {
   const goal = s.items.find((i) => i.id === s.selectedId);
   const ready = Boolean(s.ladder) && s.ladderFor === s.selectedId;
   const [saving, setSaving] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failure, setFailure] = useState<{ expired: boolean; detail: string } | null>(null);
 
   useEffect(() => {
     if (mounted && !goal) router.replace('/onboarding');
@@ -56,7 +57,7 @@ export function LadderScreen() {
   async function start() {
     if (!s.ladder || !goal) return;
     setSaving(true);
-    setFailed(false);
+    setFailure(null);
     const tz = timeZone();
     const { error } = await createClient().rpc('complete_onboarding', {
       p_timezone: tz,
@@ -74,7 +75,11 @@ export function LadderScreen() {
     if (error) {
       console.error('complete_onboarding failed', error);
       setSaving(false);
-      setFailed(true);
+      setFailure({
+        // An expired sign-in is the one failure the person can fix, so say so.
+        expired: /jwt|not signed in|PGRST301/i.test(`${error.message} ${error.code}`),
+        detail: `${error.code ? `${error.code}: ` : ''}${error.message}`,
+      });
       return;
     }
     useOnboarding.getState().reset();
@@ -166,10 +171,18 @@ export function LadderScreen() {
       </p>
 
       <div className="mt-auto pt-8">
-        {failed && (
-          <p className="mb-3 text-center text-[13px] text-error" role="alert">
-            We couldn&rsquo;t save that. Please try again.
-          </p>
+        {failure && (
+          <div className="mb-3 text-center" role="alert">
+            <p className="text-[13px] text-error">
+              {failure.expired ? 'Your sign-in has expired.' : 'We couldn’t save that. Please try again.'}
+            </p>
+            {failure.expired && (
+              <a href="/login" className="mt-1 inline-flex min-h-11 items-center text-accent underline">
+                Sign in again
+              </a>
+            )}
+            {debugEnabled && <p className="mt-1 text-[12px] break-words text-text-muted">{failure.detail}</p>}
+          </div>
         )}
         <PrimaryButton onClick={start} disabled={saving}>
           {saving ? 'Saving…' : 'Start tomorrow'}

@@ -21,11 +21,11 @@ export async function loadToday(): Promise<TodayData> {
     supabase.from('goals').select('id, title').eq('status', 'later').order('created_at'),
     supabase.from('reviews').select('id').eq('goal_id', goal.id).not('completed_at', 'is', null),
   ]);
-  if (!profile.data?.onboarded_at) redirect('/onboarding');
 
   return {
-    timezone: profile.data.timezone,
-    onboardedAt: profile.data.onboarded_at,
+    timezone: profile.data?.timezone ?? 'UTC',
+    // The goal is the source of truth for being onboarded; the profile date only feeds the review countdown.
+    onboardedAt: profile.data?.onboarded_at ?? goal.started_at ?? new Date().toISOString().slice(0, 10),
     goal: { id: goal.id, title: goal.title, started_at: goal.started_at, status: 'active' },
     steps: (steps.data ?? []) as Step[],
     planB: ladder.data?.[0]?.plan_b ?? null,
